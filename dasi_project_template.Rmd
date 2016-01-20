@@ -1,0 +1,236 @@
+---
+title: 'Work Importance and Job Satisfaction'
+output:
+  html_document:
+    fig_caption: yes
+    keep_md: yes
+    theme: cerulean
+date: "October 18th 2014"
+---
+
+##### Introduction:
+
+Research Question
+To see what effect the order of importance of work and the feeling of work accomplishment has on individuals based on their current level of satisfaction of their job. More specifically, to determine if those who believe in the importance of work and feeling of accomplishment, report that they are also highly satisfied in their job.
+
+Another question one might propose is, if one was to look for a highly satisfying job, what order of importance would they place on work importance and accomplishment? Or would other variables like money and shorter working hours be more important.
+
+
+```{r echo=FALSE}
+load(url("http://bit.ly/dasi_gss_data"))
+```
+
+##### Data Part:
+
+**Citation**
+Data Set: http://bit.ly/dasi_gss_data
+Provider: ICPSR
+T1  - General Social Survey, 1972-2012 [Cumulative File]
+UR  - http://doi.org/10.3886/ICPSR34802.v1
+PB  - Inter-university Consortium for Political and Social Research (ICPSR)
+Explanations of questions asked can be found at 
+https://d396qusza40orc.cloudfront.net/statistics%2Fproject%2Fgss1.html#satjob
+
+**Data Collection**
+Approximately 29 social surveys were conducted from the years 1972 - 2012. The surveys were conducted via interview which include face to face interviews, computer assisted (CAPI), and telephone interviews. A series of questions like demographic and attitudes were asked by the interviewers in which the respondents were asked to pick a series of choices.
+
+The entire study over the years used a stratified sampling approach to collect responses. The individuals were categorised by geography, age, gender, income, employment status and race (although race was normally recorded as black, white or other and a separate variable for Hispanic).
+
+Sampling Methods: http://publicdata.norc.org:41000/gss/documents//BOOK/GSS_Codebook_AppendixA.pdf
+
+**Data Cases**
+The observational cases were individuals living in the United States, ages 18+.  Until 2006, only English speaking individuals took part in the surveys. 
+
+
+For the variables used in this analysis there are 15211 cases.
+
+Each individual was asked to rank the order of importance of 
+"Would you please look at this card and tell me which one thing on this list you would most prefer in a job"
+
+  * HIGH INCOME
+  * NO DANGER OF BEING FIRED
+  * SHORT WORKING HOURS
+  * CHANCES FOR ADVANCEMENT
+  * WORK IMPORTANT AND FEEL ACCOMPLISHMENT
+
+
+_Please note_ Not all years are represented, due to there not being any answers for the Importance question. The years are for 1973:74,76,77,1980:84,85,87,88,89,1990:91,93,94: and a pivotal year 2012.
+
+**Data Variables**
+The two variables are ordinal categorical responses chosen by the survey respondent.  The variables are noted as 'satjob' and 'jobmeans'. Ordinal because the individuals were asked to rank either their level of satisfaction or order of importance.  
+1. **satjobs**
+"Very Satisfied" "Mod. Satisfied" "A Little Dissat" "Very Dissatisfied"
+
+2. **jobmeans**
+"Most Impt" "Second" "Third" "Fourth" "Fifth" 
+
+Fig _(explanatory variable moved to y axis to neaten up table, counts are still the same either way, only done for this table)_
+```{r size = "small"}
+counted <- table(gss$satjob,gss$jobmeans)
+addmargins(counted)
+```
+
+**Data Types**
+The two variables in this particular observational study is considered prospective because they are about an individual's attitudes at the time.
+
+The survey had both prospective and retrospective questions. Individuals were asked about their personal information and attitudes on certain subjects. They were asked some prospective questions, like about their current situation, such as income, retrospective, for example had they ever been on welfare.
+
+**Scope of inference**
+
+The population of interest is mainly English speaking individuals living in the United States, and after 2006 this includes Spanish speaking individuals. However there may be some cultural differences based on the fact that some individuals living in the United States may not have any or may have insufficient English to answer the survey questions. There also might be an age bias, that we will have to review for the two variables. Level of education, salary and such may also be confounding variables.The fact that individuals responded based on their availability and willingness to participate would suggest the sampling bias of voluntary/non response.
+
+The representative sample should be enough to infer generalisations of the attitudes of the English and most Spanish speaking population, given the large sampling over a long period of time.
+
+** Scope of inference - causality**
+
+The data can not be used to establish casual links as it is an observational study, where the survey organisations are not able to control specific variables or use control groups.  There are most likely many different variables that attribute to both job satisfaction and the level placed on work importance/accomplishments.
+
+##### Exploratory data analysis:
+
+Fig 1.1
+```{r fig.width=5, fig.height=5}
+sat_means <-  table(gss$jobmeans, gss$satjob)
+mosaicplot(sat_means, cex=0.40)
+```
+
+We have two dimensions here on the mosaic plot. The explanatory variable, jobmeans in the x axis, the response variable jobsat in the y axis. As one can see the majority of cases fall within the intersection of highly satisfied and rank the importance of work/accomplishment 1st. This is to be expected as just under 50% responded that they were highly satisfied and also just under 50% ranked the importance of work 1st. 
+
+The majority of those who ranked work importance first, were very satisfied with their current job. The very satisfied and moderately satisfied are nearly  equal when the work importance is ranked 2nd and 3rd. We start to see a shift between very satisfied and moderately satisfied, where moderately satisfied has a slightly higher percentage than very satisfied when importance of work is ranked 4th and 5th. 
+
+Fig 1.2 Contingency %
+```{r fig.width=8, fig.height=5}
+counts <- table(gss$jobmeans,gss$satjob)
+propsper <- prop.table(counts)
+tab2 <- round(propsper,2)
+propspers <- table(tab2)
+addmargins(tab2)
+
+```
+
+
+Fig 1.3
+```{r fig.width=8, fig.height=4}
+props <- prop.table(counts)
+
+barplot(props, xlab="Work Imp", col=c("darkblue", "red"), legend = rownames(props), beside=TRUE)
+```
+
+As we can see the biggest drop in percentages of order of work importance, from 1st to 2nd, is from those who are very satisfied, from 25% to 8%. Moderately satisfied drop is from 17% to 8%.
+
+Fig 1.4 **(A different data set using High Income instead of Work Importance)**
+```{r }
+
+counts2 <- table(gss$jobinc,gss$satjob)
+inc <- prop.table(counts2)
+tab3 <- round(inc,2)
+inc <- table(tab3)
+addmargins(tab3)
+```
+This is just for comparison curiosity, and will not be included in this specific analysis, but those who are in the very satisfied category ranked Job Income as the third most important, the same for moderately satisfied. The percentages for the two dissatisfied levels are about equal.
+
+To review at another time
+ref1:_boxplot(gss$age ~ gss$jobmeans (age vs work/important))_
+ref2:_boxplot(gss$age ~ gss$satjob) (age vs job satisfaction)_
+
+The above was just to look and see if there was any difference between the Work Accomplishment rankings, and the Job Satisfaction based on age.  The medians on each box plot are all about the same, irrespective of work importance ranking. Those who are between the ages 30-55 are more satisfied with their job. Obviously there are some outliers amongst the older generation. It can be assumed that after 30 one would be more settled in a job. The majority fall between ages 30 and 60, which one would expect given the normal working years before retirement. Another interesting variable to look at, would be the importance of career advancement for this age bracket compared to others.
+
+Further study of all the job preference rankings found that the majority placed work importance is 1st, followed by job promotion, then high income (although the Little and Very Dissatisfied vary),worry about being fired is 4th, while shorter working hours is 5th.
+
+##### Inference:
+
+**Hypothesis**
+
+H0=There is no association with Job Satisfaction given the Order of Work Importance, they are independent.
+
+HA=Job Satisfaction and Order of Work Importance are dependent. 
+
+The significance level to compare with the critical value, will be set to the commonly used 0.05.
+
+
+**Method for testing Hypothesis**
+For non-parametric variables, the Pearson's chi-squared test will be used. 
+The sample data will be tested using the chi-square for independence.
+This method is best for categorical variables with at least one level greater than 2. There are 4 levels for job satisfaction and 5 levels for the order of work importance.  The job satisfaction and order of work importance will be associated at the 5% significance level.
+
+The test will compromise of getting the expected counts and compare that with the actual counts, to determine if the differences are significant enough to reject the null hypothesis or if the differences are due to chance.
+
+
+**Conditions for Chi Square Test of Independence Method** 
+
+Independence check
+
+  * the responses were collected randomly, using stratified methods
+  * 15211 is definitely less than 10% of the US population, so independence should not be a problem, especially since the collection of responses were based on a stratified sample
+  * each case  can only be placed in one cell, corresponding satisfaction and work importance questions. So no one can have more than one answer for each level. A person can't be very satisfied and moderately satisfied at the same time.
+  * each cell has more that 5 cases, the least amount is 54 for this data set, so a theoretical method will be used. 
+
+**Test Score**
+
+```{r}
+chisq.test(gss$jobmeans, gss$satjob)
+
+```
+
+X&#178; = 186.69 _adding each "(obs-exp)&#178;/exp"cell together_
+
+Df = 12 (number of rows - 1 x number of columns - 1)
+_Degrees of freedom (Df) is used for estimating one statistic from another of populations from samples_
+
+Expected values
+
+It is always helpful to preview the data from the test score to ensure it makes sense.
+
+Legend _observed counts **(expected Counts)** (obs-exp)&#178;/exp_
+
+Satisfaction|Most Impt|Second|Third|Fourth|Fifth|Total
+--|--|--|--|--|--|--|
+Very Satisfied|3805(**3427.1**)41.6|1230(**1328.0**)7.2|1034(**1092.1**)3.1|676(**814**)23.4|363(**446.7**)15.7|7108|
+Mod.Satisfied|2593(**2801.8**)15.6|1156(**1085.8**)4.5|909(**892.8**)0.3|744(**665.5**)9.3|409(**365.2**)5.2|5811|
+A little Dissatis|645(**779.6**)23.3|329(**302.1**)2.4|289(**248.4**)6.6|224(**185.2**)8.1|130(**101.7**)7.9|1617|
+Very Dissatisfied|291(**325.5**)3.7|127(**126.1**)0.006|105(**103.7**)0.02|98(**77.3**)5.5|54(**42.4**)3.2|675|
+Total |7334|2842|2337|1742|956|15211|
+
+Ref3: _chisq.test(gss$jobmeans, gss$satjob)$expected_
+
+
+**Findings Description**
+With such a large test score it was not surprising to find the p value very low, even after converting it to see how many 0's were after the 0.0 the most was at 30 places after the decimal point.
+
+
+Looking at the chi-square probability table, the intersection of the row(upper tail) would be 12, equal to df, going across to the last X&#178;, at 32.91, we can see that 186.69 would render a very very low p value.
+
+
+P( X &#178; > 186.69) = 0.000000000000(2.2e-16)
+
+A low p value leads to rejecting the null hypothesis, based on the fact that the probability of finding 
+
+##### Conclusion:
+As previously noted, 2012 was a pivotal year for the Order of Importance question. Previous years showed that many of respondents ordered Work Accomplishment first, however in 2012 the majority placed Work Accomplishment third. This was probably due to the dismal outlook on the economy. The missing years from 1995-2011 make it hard to ascertain where the change happened though, as in this time period there was also the dot-com bust.
+A trending analysis for each year would be very interesting, with years for 1972 - 1994 as a baseline, to see how the responses for  _"Would you please look at this card and tell me which one thing on this list you would most prefer in a job"_ , change over time.
+
+The evidence presented so far from the chi-square test, would lead to the conclusion that job satisfaction and order of work accomplishment importance are dependent. 
+
+However after further analysis of the question
+_"Would you please look at this card and tell me which one thing on this list you would most prefer in a job"_, the majority in each level of satisfaction ranked the importance of work accomplishment first, possibly suggesting that it is important no matter what the level of satisfaction. 
+
+It would be easy to make a Type 1 error for this, thinking that there is strong association between two variables, even if there is not. 
+
+Further tests, perhaps ones that take into account the order of ordinal categorical variables, would need to be applied to measure the p value against the significance level.
+
+One issue with attitudinal surveys is that not everyone would estimate the difference between being very satisfied, to moderately satisfied the same. One could almost put them into two categories as being satisfied or not.  
+
+A few other variables one could look at would be the reported income, gender and level of education and what effect that has on the two variables as well, but it is out of scope for this specific analysis.
+
+ref: table(gss$satjob, gss$jobmeans, gss$year)
+
+##Appendix Preview of Data set (not included in page count)
+
+```{r}
+head(gss$satjob, n = 50)
+tail(gss$jobmeans, n = 69, na.omit)
+```
+
+###Note to those reviewing this.
+
+Detailed feedback would be very welcome. The project taught me a lot, a couple of hiccups, but I can fully believe that, even more so than before,  how all analysis like this needs to be peer reviewed. Please let me know of any errors or if it does not make sense.
+
